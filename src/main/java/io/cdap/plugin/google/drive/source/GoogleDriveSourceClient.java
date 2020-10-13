@@ -23,8 +23,8 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import io.cdap.plugin.google.common.APIRequestRetryer;
 import io.cdap.plugin.google.common.GoogleDriveFilteringClient;
+import io.cdap.plugin.google.common.utils.ExportedType;
 import io.cdap.plugin.google.drive.common.FileFromFolder;
-import io.cdap.plugin.google.drive.source.utils.ExportedType;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -82,14 +82,14 @@ public class GoogleDriveSourceClient extends GoogleDriveFilteringClient<GoogleDr
     return fileFromFolderRetryer.call(() -> {
       FileFromFolder fileFromFolder;
 
-      Drive.Files.Get request = service.files().get(fileId).setFields("*");
+      Drive.Files.Get request = service.files().get(fileId).setSupportsAllDrives(true).setFields("*");
       File currentFile = request.execute();
 
       String mimeType = currentFile.getMimeType();
       long offset = bytesFrom == null ? 0L : bytesFrom;
       if (!mimeType.startsWith(DRIVE_DOCS_MIME_PREFIX)) {
         OutputStream outputStream = new ByteArrayOutputStream();
-        Drive.Files.Get get = service.files().get(currentFile.getId());
+        Drive.Files.Get get = service.files().get(currentFile.getId()).setSupportsAllDrives(true);
 
         if (bytesFrom != null && bytesTo != null) {
           get.getMediaHttpDownloader().setDirectDownloadEnabled(true);

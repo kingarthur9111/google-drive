@@ -73,7 +73,10 @@ public class GoogleDriveFilteringClient<C extends GoogleFilteringSourceConfig> e
       int actualFilesNumber = filesNumber;
       Drive.Files.List request = service.files().list()
           .setQ(generateFilter(exportedTypes))
-          .setFields("nextPageToken, files(id, size)");
+              .setIncludeItemsFromAllDrives(true)
+              .setSupportsAllDrives(true)
+              .setCorpora("allDrives")
+              .setFields("nextPageToken, files(id, size)");
       if (actualFilesNumber > 0) {
         request.setPageSize(actualFilesNumber);
       } else {
@@ -101,6 +104,8 @@ public class GoogleDriveFilteringClient<C extends GoogleFilteringSourceConfig> e
     sb.append(config.getDirectoryIdentifier());
     sb.append("' in parents");
 
+    // remove trash file
+    sb.append(" and trashed=false");
     // prepare query for non folders
     sb.append(" and mimeType != '");
     sb.append(DRIVE_FOLDER_MIME);
