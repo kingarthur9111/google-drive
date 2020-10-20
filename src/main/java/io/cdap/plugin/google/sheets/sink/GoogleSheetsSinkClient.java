@@ -361,9 +361,10 @@ public class GoogleSheetsSinkClient extends GoogleSheetsClient<GoogleSheetsSinkC
   public void moveSpreadsheetToDestinationFolder(String spreadsheetsId, String spreadsheetName)
     throws ExecutionException, RetryException {
     APIRequestRetryer.getRetryer(config,
-      String.format("Moving the spreadsheet '%s' to destination folder.", spreadsheetName))
+      String.format("Moving the spreadsheet '%s'(id:'%s') to destination folder.", spreadsheetName, spreadsheetsId))
       .call(() -> {
         drive.files().update(spreadsheetsId, null)
+                .setSupportsAllDrives(true)
           .setAddParents(config.getDirectoryIdentifier())
           .setRemoveParents("root")
           .setFields("id, parents")
